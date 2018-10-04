@@ -20,7 +20,9 @@ const menuTemplate = [
         label: "File",
         submenu: [
             { label: "New Todo" },
-            { label: "Quit" , click(){
+            { label: "Quit" ,
+            accelerator: process.platform === "darwin" ? "Command+Q" : "Ctrl+Q",
+            click(){
                 app.quit();
             }}
        ]
