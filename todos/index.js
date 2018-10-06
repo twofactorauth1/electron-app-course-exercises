@@ -2,12 +2,15 @@ const electron = require("electron");
 
 const { app, BrowserWindow, Menu } = electron;
 
-let mainWindwo;
+let mainWindow;
 let addWindow;
 
 app.on("ready", () => {
-    mainWindwo = new BrowserWindow({});
-    mainWindwo.loadURL(`file://${__dirname}/main.html`);
+    mainWindow = new BrowserWindow({});
+    mainWindow.loadURL(`file://${__dirname}/main.html`);
+
+    // if main window is close, close all child windows
+    mainWindow.on("closed", () => app.quit());
     
     const mainMenu = Menu.buildFromTemplate(menuTemplate);
 
