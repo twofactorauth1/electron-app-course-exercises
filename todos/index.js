@@ -53,3 +53,16 @@ const menuTemplate = [
 if(process.platform === "darwin"){
     menuTemplate.unshift({});
 }
+
+if(process.env.NODE_ENV !== "production"){
+    menuTemplate.push({
+        label: 'Developer',
+        accelerator: process.platform === "darwin" ? "Command+Alt+I" : "Ctrl+Shift+I",
+        submenu: [{
+            label: 'Toggle Developer Tools',
+            click(item, focusedWindow){
+              focusedWindow.toggleDevTools();
+            }
+        }]
+    });
+} 
