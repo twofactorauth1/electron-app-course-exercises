@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Todos</title>
+</head>
+<body onload="getTodoList()">
+    <div>Todos App</div>
+    <div>
+        <ul></ul>
+    </div>
+    <script>
+     const electron = require("electron");
+     const { ipcRenderer } = electron;
+     
+     function createList(todo){
+         debugger;
+         const li = document.createElement("li");
+         const text = document.createTextNode(todo);
+         const button = document.createElement("button");
+         const buttonText = document.createTextNode("Delete");
+         button.addEventListener("click", function(event){
+            li.parentNode.removeChild(li);
+         });
+
+         button.appendChild(buttonText);
+
+         li.appendChild(text);
+         li.appendChild(button);
+         document.querySelector("ul").appendChild(li);
+     }
+
+     function getTodoList(){
+        ipcRenderer.send("todo:all");
+     }
+
+     // listen for add todo
+     ipcRenderer.on("todo:add", (event, todo) => {
+         console.log(todo);
+        createList(todo)
+     });
+    
+    // listen for all todos
+    ipcRenderer.on("todo:listAll", (event, todos) => {
+         todos.forEach(({ todo }, index) => createList(todo))
+    });
+    </script>
+</body>
+</html>
