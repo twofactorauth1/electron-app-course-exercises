@@ -1,5 +1,6 @@
 const electron = require("electron");
 const fs = require('fs');
+const createFile = require('create-file');
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 
 let mainWindow;
@@ -30,30 +31,45 @@ function createAddWindow(){
     addWindow.on("closed", () => addWindow = null);
 }
 
-ipcMain.on("todo:all", (event, data) => {
+function readFile(cb){
     fs.readFile('data.json', 'utf8', function readFileCallback(err, data){
         if (err){
             console.log(err);
-        } else {
-        if(!data){
-            console.log('-----------todos----s--');
-
-            mainWindow.webContents.send("todo:listAll", {});
-        }else{
-            const todos = JSON.parse(data);
-            console.log('-----------todos------',todos);
-            mainWindow.webContents.send("todo:listAll", todos);
+        } else { 
+            cb(data);
         }
+    });
+}
 
-    }}); 
+ipcMain.on("todo:all", (event, data) => {
+    if (!fs.existsSync('data.json')) {
+        createFile('data.json', '', () => {
+            readFile((data) => {
+                if(!data){        
+                    mainWindow.webContents.send("todo:listAll", {});
+                }else{
+                    const todos = JSON.parse(data);
+                    mainWindow.webContents.send("todo:listAll", todos);
+                }
+            });
+        });
+    }else{
+        readFile((data) => {
+            if(!data){        
+                mainWindow.webContents.send("todo:listAll", {});
+            }else{
+                const todos = JSON.parse(data);
+                mainWindow.webContents.send("todo:listAll", todos);
+            }
+        })
+    }
+
+    
 });
 
 ipcMain.on("todo:add", (event, todo) => {
     // save todo in file
-    fs.readFile('data.json', 'utf8', function readFileCallback(err, data){
-        if (err){
-            console.log(err);
-        } else {
+    readFile((data) => { 
         const id = Math.random().toString(36).slice(-7);
         const saveTodo = { id , todo };
         if(!data){
@@ -62,7 +78,6 @@ ipcMain.on("todo:add", (event, todo) => {
         }else{
             const todos = JSON.parse(data);
             todos.push(saveTodo);
-            console.log('-----------todos------',todos);
             fs.writeFile('data.json', JSON.stringify(todos), 'utf8', () => {}); 
 
             mainWindow.webContents.send("todo:list", todos);
@@ -72,24 +87,17 @@ ipcMain.on("todo:add", (event, todo) => {
 
         // close child window
         addWindow.close();
-    }});
+ });
 });
 
 ipcMain.on("todo:delete", (event, id) => {
-    fs.readFile('data.json', 'utf8', function readFileCallback(err, data){
-        if (err){
-            console.log(err);
-        } else {       
-
+    readFile((data) => {      
         const todos = JSON.parse(data);
         const updatedTodos  = todos.filter((todo) => todo.id !== id);
-        console.log('-----------todos------',updatedTodos);
         fs.writeFile('data.json', JSON.stringify(updatedTodos), 'utf8', () => {}); 
 
-        mainWindow.webContents.send("todo:deleted", id);
-       
-    }});
-    console.log("--------", id);
+        mainWindow.webContents.send("todo:deleted", id);    
+  });
 });
 
 const menuTemplate = [

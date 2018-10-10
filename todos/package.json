@@ -14,5 +14,8 @@
   "devDependencies": {
     "electron": "^3.0.3",
     "electron-builder": "^20.28.4"
+  },
+  "dependencies": {
+    "create-file": "^1.0.1"
   }
 }
