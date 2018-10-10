@@ -15,14 +15,14 @@
      const electron = require("electron");
      const { ipcRenderer } = electron;
      
-     function createList(todo){
-         debugger;
+     function createList({id, todo }){
          const li = document.createElement("li");
+         li.id = id;
          const text = document.createTextNode(todo);
          const button = document.createElement("button");
          const buttonText = document.createTextNode("Delete");
          button.addEventListener("click", function(event){
-            li.parentNode.removeChild(li);
+            ipcRenderer.send("todo:delete", id);            
          });
 
          button.appendChild(buttonText);
@@ -44,8 +44,13 @@
     
     // listen for all todos
     ipcRenderer.on("todo:listAll", (event, todos) => {
-         todos.forEach(({ todo }, index) => createList(todo))
+         todos.forEach((todo, index) => createList(todo))
     });
+
+    ipcRenderer.on("todo:deleted", (event, id) => {
+        const elem = document.getElementById(id);
+        elem.parentNode.removeChild(elem);
+    })
     </script>
 </body>
 </html>

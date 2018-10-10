@@ -55,24 +55,41 @@ ipcMain.on("todo:add", (event, todo) => {
             console.log(err);
         } else {
         const id = Math.random().toString(36).slice(-7);
-
+        const saveTodo = { id , todo };
         if(!data){
-            fs.writeFile('data.json', JSON.stringify([{ id , todo }]), 'utf8', () => {}); 
+            fs.writeFile('data.json', JSON.stringify([saveTodo]), 'utf8', () => {}); 
             
         }else{
             const todos = JSON.parse(data);
-            todos.push({id ,todo});
+            todos.push(saveTodo);
             console.log('-----------todos------',todos);
             fs.writeFile('data.json', JSON.stringify(todos), 'utf8', () => {}); 
 
             mainWindow.webContents.send("todo:list", todos);
         }
         
-        mainWindow.webContents.send("todo:add", todo);
+        mainWindow.webContents.send("todo:add", saveTodo);
 
         // close child window
         addWindow.close();
     }});
+});
+
+ipcMain.on("todo:delete", (event, id) => {
+    fs.readFile('data.json', 'utf8', function readFileCallback(err, data){
+        if (err){
+            console.log(err);
+        } else {       
+
+        const todos = JSON.parse(data);
+        const updatedTodos  = todos.filter((todo) => todo.id !== id);
+        console.log('-----------todos------',updatedTodos);
+        fs.writeFile('data.json', JSON.stringify(updatedTodos), 'utf8', () => {}); 
+
+        mainWindow.webContents.send("todo:deleted", id);
+       
+    }});
+    console.log("--------", id);
 });
 
 const menuTemplate = [

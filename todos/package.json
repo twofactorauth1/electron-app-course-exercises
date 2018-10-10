@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "electron": "electron .",
-    "build-linux": "electron-builder -l",
+    "build-linux": "NODE_ENV=production electron-builder -l",
     "build-windows": "electron-builder -w"
   },
   "keywords": [],
