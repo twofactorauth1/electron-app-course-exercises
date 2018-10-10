@@ -1,13 +1,18 @@
 const electron = require("electron");
 const fs = require('fs');
 const createFile = require('create-file');
+const Notification = require('electron-native-notification');
 const { app, BrowserWindow, Menu, ipcMain } = electron;
 
 let mainWindow;
 let addWindow;
 
 app.on("ready", () => {
-    mainWindow = new BrowserWindow({});
+    mainWindow = new BrowserWindow({
+        height: 600,
+        width: 600,
+
+    });
     mainWindow.loadURL(`file://${__dirname}/main.html`);
 
     // if main window is close, close all child windows
@@ -19,6 +24,14 @@ app.on("ready", () => {
     Menu.setApplicationMenu(mainMenu);
      
 });
+
+function showNotifiction(title, body){
+    const opt = { body };
+ 
+    const notification = new Notification(title, opt);       
+
+    setTimeout(() => notification.close(), 2000);
+}
 
 function createAddWindow(){
     addWindow = new BrowserWindow({
@@ -85,6 +98,7 @@ ipcMain.on("todo:add", (event, todo) => {
         
         mainWindow.webContents.send("todo:add", saveTodo);
 
+        showNotifiction('Todo Saved', `Todo: ${todo} saved`);
         // close child window
         addWindow.close();
  });
@@ -95,7 +109,7 @@ ipcMain.on("todo:delete", (event, id) => {
         const todos = JSON.parse(data);
         const updatedTodos  = todos.filter((todo) => todo.id !== id);
         fs.writeFile('data.json', JSON.stringify(updatedTodos), 'utf8', () => {}); 
-
+        showNotifiction('Todo Deleted', `Todo deleted`);
         mainWindow.webContents.send("todo:deleted", id);    
   });
 });
