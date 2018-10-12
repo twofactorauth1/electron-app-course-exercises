@@ -11,8 +11,8 @@ app.on("ready", () => {
     mainWindow = new BrowserWindow({
         height: 600,
         width: 600,
-
     });
+    
     mainWindow.loadURL(`file://${__dirname}/main.html`);
 
     // if main window is close, close all child windows

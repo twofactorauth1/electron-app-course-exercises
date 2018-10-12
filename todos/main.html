@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="w3.css">
     <title>My Todos</title>
 </head>
 <body onload="getTodoList()">
-    <div>Todos App</div>
-    <div>
-        <ul></ul>
+    <div class="w3-container">
+        <h2>Todos App</h2>
+        <div>
+            <ul class="w3-ul w3-card-4"></ul>
+        </div>
     </div>
     <script>
      const electron = require("electron");
@@ -18,14 +21,18 @@
      function createList({id, todo }){
          const li = document.createElement("li");
          li.id = id;
+         li.classList.add("w3-display-container");
          const text = document.createTextNode(todo);
-         const button = document.createElement("button");
+         const button = document.createElement("span");
          const buttonText = document.createTextNode("Delete");
          button.addEventListener("click", function(event){
             ipcRenderer.send("todo:delete", id);            
          });
 
          button.appendChild(buttonText);
+         button.classList.add("w3-button");
+         button.classList.add("w3-transparent");
+         button.classList.add("w3-display-right");
 
          li.appendChild(text);
          li.appendChild(button);
