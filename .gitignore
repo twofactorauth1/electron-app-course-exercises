@@ -59,5 +59,8 @@ typings/
 
 # next.js build output
 .next
+<<<<<<< HEAD
 
 dist
+=======
+>>>>>>> upstream/master
